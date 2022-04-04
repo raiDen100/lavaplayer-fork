@@ -11,10 +11,10 @@ LavaPlayer is an audio player library written in Java which can load audio track
 
 #### Maven package
 
-Replace `x.y.z` with the latest version number: [![](https://jitpack.io/v/walkyst/lavaplayer-fork.svg)](https://jitpack.io/#walkyst/lavaplayer-fork)
+Replace `x.y.z` with the latest version number: [![](https://jitpack.io/v/raiDen100/lavaplayer-fork.svg)](https://jitpack.io/#raiDen100/lavaplayer-fork)
 
 * Repository: https://jitpack.io
-* Artifact: **com.github.walkyst:lavaplayer-fork:x.y.z**
+* Artifact: **com.github.raiDen100:lavaplayer-fork:x.y.z**
 
 Using in Gradle:
 ```gradle
@@ -25,7 +25,7 @@ repositories {
 }
 
 dependencies {
-  implementation 'com.github.walkyst:lavaplayer-fork:x.y.z'
+  implementation 'com.github.raiDen100:lavaplayer-fork:x.y.z'
 }
 ```
 
@@ -40,7 +40,7 @@ Using in Maven:
 
 <dependencies>
   <dependency>
-    <groupId>com.github.walkyst</groupId>
+    <groupId>com.github.raiDen100</groupId>
     <artifactId>lavaplayer-fork</artifactId>
     <version>x.y.z</version>
   </dependency>
