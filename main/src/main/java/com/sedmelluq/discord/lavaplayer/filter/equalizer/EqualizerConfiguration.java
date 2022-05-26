@@ -22,7 +22,7 @@ public class EqualizerConfiguration {
    */
   public void setGain(int band, float value) {
     if (isValidBand(band)) {
-      bandMultipliers[band] = Math.max(Math.min(value, 1.0f), -0.25f);
+      bandMultipliers[band] = value;
     }
   }
 
