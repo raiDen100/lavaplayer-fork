@@ -2,6 +2,7 @@ package com.sedmelluq.discord.lavaplayer.container.ogg;
 
 import com.sedmelluq.discord.lavaplayer.tools.Units;
 import com.sedmelluq.discord.lavaplayer.track.info.AudioTrackInfoProvider;
+
 import java.util.Collections;
 import java.util.Map;
 
@@ -45,6 +46,16 @@ public class OggMetadata implements AudioTrackInfoProvider {
 
   @Override
   public String getUri() {
+    return null;
+  }
+
+  @Override
+  public String getArtworkUrl() {
+    return null;
+  }
+
+  @Override
+  public String getISRC() {
     return null;
   }
 }

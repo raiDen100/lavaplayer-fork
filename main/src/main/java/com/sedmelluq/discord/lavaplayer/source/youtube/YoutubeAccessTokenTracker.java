@@ -434,8 +434,8 @@ public class YoutubeAccessTokenTracker {
   private URI buildUri(String url, List<NameValuePair> params) {
     try {
       return new URIBuilder(url)
-          .addParameters(params)
-          .build();
+              .addParameters(params)
+              .build();
     } catch (URISyntaxException e) {
       throw new RuntimeException(e);
     }

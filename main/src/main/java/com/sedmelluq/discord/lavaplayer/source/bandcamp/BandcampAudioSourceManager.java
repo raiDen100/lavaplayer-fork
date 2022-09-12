@@ -10,27 +10,25 @@ import com.sedmelluq.discord.lavaplayer.tools.io.HttpClientTools;
 import com.sedmelluq.discord.lavaplayer.tools.io.HttpConfigurable;
 import com.sedmelluq.discord.lavaplayer.tools.io.HttpInterface;
 import com.sedmelluq.discord.lavaplayer.tools.io.HttpInterfaceManager;
-import com.sedmelluq.discord.lavaplayer.track.AudioItem;
-import com.sedmelluq.discord.lavaplayer.track.AudioReference;
-import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
-import com.sedmelluq.discord.lavaplayer.track.BasicAudioPlaylist;
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import com.sedmelluq.discord.lavaplayer.track.*;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClientBuilder;
+
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static com.sedmelluq.discord.lavaplayer.tools.FriendlyException.Severity.FAULT;
 import static com.sedmelluq.discord.lavaplayer.tools.FriendlyException.Severity.SUSPICIOUS;
@@ -41,6 +39,8 @@ import static com.sedmelluq.discord.lavaplayer.tools.FriendlyException.Severity.
 public class BandcampAudioSourceManager implements AudioSourceManager, HttpConfigurable {
   private static final String URL_REGEX = "^(https?://(?:[^.]+\\.|)bandcamp\\.com)/(track|album)/([a-zA-Z0-9-_]+)/?(?:\\?.*|)$";
   private static final Pattern urlRegex = Pattern.compile(URL_REGEX);
+
+  private static final String ARTWORK_URL_FORMAT = "https://f4.bcbits.com/img/a%s_1.png";
 
   private final HttpInterfaceManager httpInterfaceManager;
 
@@ -85,8 +85,9 @@ public class BandcampAudioSourceManager implements AudioSourceManager, HttpConfi
     return extractFromPage(urlInfo.fullUrl, (httpClient, text) -> {
       JsonBrowser trackListInfo = readTrackListInformation(text);
       String artist = trackListInfo.get("artist").safeText();
+      String artworkUrl = extractArtwork(trackListInfo);
 
-      return extractTrack(trackListInfo.get("trackinfo").index(0), urlInfo.baseUrl, artist);
+      return extractTrack(trackListInfo.get("trackinfo").index(0), urlInfo.baseUrl, artist, artworkUrl);
     });
   }
 
@@ -94,10 +95,11 @@ public class BandcampAudioSourceManager implements AudioSourceManager, HttpConfi
     return extractFromPage(urlInfo.fullUrl, (httpClient, text) -> {
       JsonBrowser trackListInfo = readTrackListInformation(text);
       String artist = trackListInfo.get("artist").text();
+      String artworkUrl = extractArtwork(trackListInfo);
 
       List<AudioTrack> tracks = new ArrayList<>();
       for (JsonBrowser trackInfo : trackListInfo.get("trackinfo").values()) {
-        tracks.add(extractTrack(trackInfo, urlInfo.baseUrl, artist));
+        tracks.add(extractTrack(trackInfo, urlInfo.baseUrl, artist, artworkUrl));
       }
 
       JsonBrowser albumInfo = readAlbumInformation(text);
@@ -105,7 +107,7 @@ public class BandcampAudioSourceManager implements AudioSourceManager, HttpConfi
     });
   }
 
-  private AudioTrack extractTrack(JsonBrowser trackInfo, String bandUrl, String artist) {
+  private AudioTrack extractTrack(JsonBrowser trackInfo, String bandUrl, String artist, String artworkUrl) {
     String trackPageUrl = bandUrl + trackInfo.get("title_link").text();
 
     return new BandcampAudioTrack(new AudioTrackInfo(
@@ -114,7 +116,9 @@ public class BandcampAudioSourceManager implements AudioSourceManager, HttpConfi
         (long) (trackInfo.get("duration").as(Double.class) * 1000.0),
         bandUrl + trackInfo.get("title_link").text(),
         false,
-        trackPageUrl
+        trackPageUrl,
+        artworkUrl,
+        null
     ), this);
   }
 
@@ -164,6 +168,21 @@ public class BandcampAudioSourceManager implements AudioSourceManager, HttpConfi
     }
 
     return extractor.extract(httpInterface, responseText);
+  }
+
+  private String extractArtwork(JsonBrowser root) {
+    String artId = root.get("art_id").text();
+    if (artId != null) {
+      if (artId.length() < 10) {
+        StringBuilder builder = new StringBuilder(artId);
+        while (builder.length() < 10) {
+          builder.insert(0, "0");
+        }
+        artId = builder.toString();
+      }
+      return String.format(ARTWORK_URL_FORMAT, artId);
+    }
+    return null;
   }
 
   @Override

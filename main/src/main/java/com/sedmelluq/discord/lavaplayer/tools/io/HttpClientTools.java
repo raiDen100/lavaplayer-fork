@@ -160,14 +160,14 @@ public class HttpClientTools {
 
   /**
    * @param response The response.
-   * @param context  Additional string to include in exception message.
-   * @return True if this status code indicates a redirect with a response body
+   * @param context Additional string to include in exception message.
+   * @return True if this status code indicates a success with a response body
    */
   public static void assertSuccessWithRedirectContent(HttpResponse response, String context) throws IOException {
     int statusCode = response.getStatusLine().getStatusCode();
 
     if (!isRedirectStatus(statusCode)) {
-      throw new IOException("Invalid status code for " + context + ": " + statusCode);
+      throw new IOException("Invalid status code for " + context +  ": " + statusCode);
     }
   }
 

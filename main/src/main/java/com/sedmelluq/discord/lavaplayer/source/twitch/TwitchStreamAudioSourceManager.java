@@ -56,8 +56,8 @@ public class TwitchStreamAudioSourceManager implements AudioSourceManager, HttpC
    * @param clientId The Twitch client id for your application.
    */
   public TwitchStreamAudioSourceManager(String clientId) {
-    httpInterfaceManager = HttpClientTools.createDefaultThreadLocalManager();
-    twitchClientId = clientId;
+      httpInterfaceManager = HttpClientTools.createDefaultThreadLocalManager();
+      twitchClientId = clientId;
   }
 
   public String getClientId() {
@@ -90,13 +90,17 @@ public class TwitchStreamAudioSourceManager implements AudioSourceManager, HttpC
       String displayName = streamName;
       String title = channelInfo.get("lastBroadcast").get("title").text();
 
+      final String thumbnail = channelInfo.get("profileImageURL").text().replaceFirst("-70x70", "-300x300");
+
       return new TwitchStreamAudioTrack(new AudioTrackInfo(
           title,
           displayName,
           Units.DURATION_MS_UNKNOWN,
           reference.identifier,
           true,
-          reference.identifier
+          reference.identifier,
+          thumbnail,
+          null
       ), this);
     }
   }

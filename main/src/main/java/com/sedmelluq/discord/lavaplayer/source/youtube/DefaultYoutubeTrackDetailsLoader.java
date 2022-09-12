@@ -62,6 +62,11 @@ public class DefaultYoutubeTrackDetailsLoader implements YoutubeTrackDetailsLoad
         return null;
       }
 
+      if (!videoId.equals(initialData.playerResponse.get("videoDetails").get("videoId").text())) {
+        throw new FriendlyException("Video returned by YouTube isn't requested one", COMMON,
+            new IllegalStateException(initialData.playerResponse.format()));
+      }
+
       YoutubeTrackJsonData finalData = augmentWithPlayerScript(initialData, httpInterface, videoId, requireFormats);
       return new DefaultYoutubeTrackDetails(videoId, finalData);
     } catch (FriendlyException e) {
@@ -197,16 +202,16 @@ public class DefaultYoutubeTrackDetailsLoader implements YoutubeTrackDetailsLoad
   }
 
   protected JsonBrowser loadTrackInfoFromInnertube(
-      HttpInterface httpInterface,
-      String videoId,
-      YoutubeAudioSourceManager sourceManager,
-      InfoStatus infoStatus
+          HttpInterface httpInterface,
+          String videoId,
+          YoutubeAudioSourceManager sourceManager,
+          InfoStatus infoStatus
   ) throws IOException {
     if (cachedPlayerScript == null) fetchScript(videoId, httpInterface);
 
     YoutubeSignatureCipher playerScriptTimestamp = sourceManager.getSignatureResolver().getExtractedScript(
-        httpInterface,
-        cachedPlayerScript.playerScriptUrl
+            httpInterface,
+            cachedPlayerScript.playerScriptUrl
     );
     HttpPost post = new HttpPost(PLAYER_URL);
     StringEntity payload;
@@ -251,10 +256,10 @@ public class DefaultYoutubeTrackDetailsLoader implements YoutubeTrackDetailsLoad
   }
 
   protected YoutubeTrackJsonData augmentWithPlayerScript(
-      YoutubeTrackJsonData data,
-      HttpInterface httpInterface,
-      String videoId,
-      boolean requireFormats
+          YoutubeTrackJsonData data,
+          HttpInterface httpInterface,
+          String videoId,
+          boolean requireFormats
   ) throws IOException {
     long now = System.currentTimeMillis();
 

@@ -2,6 +2,7 @@ package com.sedmelluq.discord.lavaplayer.source.youtube;
 
 import com.sedmelluq.discord.lavaplayer.tools.DataFormatTools;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
+import com.sedmelluq.discord.lavaplayer.tools.http.HttpContextFilter;
 import com.sedmelluq.discord.lavaplayer.tools.http.HttpContextRetryCounter;
 import com.sedmelluq.discord.lavaplayer.tools.io.HttpClientTools;
 import org.apache.http.HttpResponse;
@@ -18,7 +19,7 @@ import java.net.URISyntaxException;
 
 import static com.sedmelluq.discord.lavaplayer.tools.FriendlyException.Severity.COMMON;
 
-public class YoutubeHttpContextFilter extends BaseYoutubeHttpContextFilter {
+public class YoutubeHttpContextFilter implements HttpContextFilter {
   private static final String ATTRIBUTE_RESET_RETRY = "isResetRetry";
   private static final HttpContextRetryCounter retryCounter = new HttpContextRetryCounter("yt-token-retry");
 
@@ -43,7 +44,7 @@ public class YoutubeHttpContextFilter extends BaseYoutubeHttpContextFilter {
 
   @Override
   public void onContextClose(HttpClientContext context) {
-
+    
   }
 
   @Override
